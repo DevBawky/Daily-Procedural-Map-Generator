@@ -1,79 +1,127 @@
 import random
-from datetime import datetime
+import datetime
+import json
+import os
 
-WIDTH = 40
-HEIGHT = 15
-WALL = '⬛'
-FLOOR = '⬜'
-FILL_PROBABILITY = 0.45
+WIDTH = 60
+HEIGHT = 20
+WALL_PROBABILITY = 0.45
+ITERATIONS = 5
 
-def initialize_map():
-    return [[WALL if random.random() < FILL_PROBABILITY else FLOOR 
-             for _ in range(WIDTH)] for _ in range(HEIGHT)]
+START_MARKER = "<" + "!-- DAILY_MAP_START --" + ">"
+END_MARKER = "<" + "!-- DAILY_MAP_END --" + ">"
 
-def count_walls(map_data, x, y):
-    count = 0
-    for i in range(-1, 2):
-        for j in range(-1, 2):
-            nx, ny = x + i, y + j
-            if i == 0 and j == 0:
-                continue
-            if nx < 0 or ny < 0 or nx >= WIDTH or ny >= HEIGHT:
-                count += 1
-            elif map_data[ny][nx] == WALL:
-                count += 1
-    return count
-
-def smooth_map(map_data):
-    new_map = [[FLOOR for _ in range(WIDTH)] for _ in range(HEIGHT)]
-    for y in range(HEIGHT):
-        for x in range(WIDTH):
-            neighbors = count_walls(map_data, x, y)
-            if neighbors > 4:
-                new_map[y][x] = WALL
-            elif neighbors < 4:
-                new_map[y][x] = FLOOR
-            else:
-                new_map[y][x] = map_data[y][x]
-    return new_map
-
-def map_to_string(map_data):
-    return '\n'.join([''.join(row) for row in map_data])
-
-def update_readme(map_str):
-    readme_path = "README.md"
-
-    start_marker = "<" + "!-- DAILY_MAP_START --" + ">"
-    end_marker = "<" + "!-- DAILY_MAP_END --" + ">"
-    
-    date_str = datetime.now().strftime('%Y/%m/%d')
-    new_content = f"{start_marker}\n### Today's Generated Map ({date_str})\n```\n{map_str}\n```\n_By DevBawky_\n{end_marker}"
-
-    try:
-        with open(readme_path, "r", encoding="utf-8") as f:
-            content = f.read()
+class MapGenerator:
+    def __init__(self, width, height, seed=None):
+        self.width = width
+        self.height = height
+        self.grid = []
         
-        if start_marker in content and end_marker in content:
-            pre = content.split(start_marker)[0]
-            post = content.split(end_marker)[1]
-            final_content = pre + new_content + post
+        if seed is None:
+            today_str = datetime.date.today().strftime("%Y%m%d")
+            self.seed = int(today_str)
         else:
-            final_content = content + "\n" + new_content
-
-        with open(readme_path, "w", encoding="utf-8") as f:
-            f.write(final_content)
+            self.seed = seed
             
-    except FileNotFoundError:
-        print("README.md not found. Creating new one.")
+        random.seed(self.seed)
+
+    def initialize_grid(self):
+        """Randomly initialize the grid with walls and floors."""
+        self.grid = [[1 if random.random() < WALL_PROBABILITY else 0 
+                      for _ in range(self.width)] for _ in range(self.height)]
+
+    def count_neighbors(self, x, y):
+        """Count wall neighbors around (x, y)."""
+        count = 0
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                if i == 0 and j == 0:
+                    continue
+                nx, ny = x + i, y + j
+                if nx < 0 or ny < 0 or nx >= self.width or ny >= self.height:
+                    count += 1
+                elif self.grid[ny][nx] == 1:
+                    count += 1
+        return count
+
+    def simulation_step(self):
+        new_grid = [[0 for _ in range(self.width)] for _ in range(self.height)]
+        for y in range(self.height):
+            for x in range(self.width):
+                neighbors = self.count_neighbors(x, y)
+                if neighbors > 4:
+                    new_grid[y][x] = 1
+                elif neighbors < 4:
+                    new_grid[y][x] = 0
+                else:
+                    new_grid[y][x] = self.grid[y][x]
+        self.grid = new_grid
+
+    def generate(self):
+        """Run the full generation process."""
+        self.initialize_grid()
+        for _ in range(ITERATIONS):
+            self.simulation_step()
+        return self.grid
+
+    def get_ascii_art(self):
+        """Convert grid to ASCII art."""
+        ascii_map = ""
+        for row in self.grid:
+            line = "".join(["⬛" if cell == 1 else "⬜" for cell in row])
+            ascii_map += line + "\n"
+        return ascii_map
+
+    def save_to_json(self, filename="today_map.json"):
+        """Save map data to JSON file."""
+        data = {
+            "date": datetime.date.today().isoformat(),
+            "seed": self.seed,
+            "width": self.width,
+            "height": self.height,
+            "grid": self.grid
+        }
+        with open(filename, 'w') as f:
+            json.dump(data, f, indent=4)
+        print(f"Map data saved to {filename}")
+
+def update_readme(ascii_art, seed):
+    """Update the README.md file with the new map and link."""
+    readme_path = "README.md"
+    
+    if not os.path.exists(readme_path):
+        print("README.md not found.")
+        return
+
+    with open(readme_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    today = datetime.date.today().strftime("%Y/%m/%d")
+    new_section = f"{START_MARKER}\n"
+    new_section += f"### Today's Generated Map ({today})\n"
+    new_section += "```\n"
+    new_section += ascii_art
+    new_section += "```\n"
+    new_section += f"_Generated by Cellular Automata_\n\n"
+    new_section += f"[Download Map Data (JSON)](./today_map.json) | **Seed:** `{seed}`\n"
+    new_section += END_MARKER
+
+    if START_MARKER in content and END_MARKER in content:
+        before = content.split(START_MARKER)[0]
+        after = content.split(END_MARKER)[1]
+        new_content = before + new_section + after
+        
         with open(readme_path, "w", encoding="utf-8") as f:
             f.write(new_content)
+        print("README updated successfully.")
+    else:
+        print("Markers not found in README.")
 
 if __name__ == "__main__":
-    dungeon = initialize_map()
+    generator = MapGenerator(WIDTH, HEIGHT)
+    generator.generate()
     
-    for _ in range(5):
-        dungeon = smooth_map(dungeon)
-        
-    map_str = map_to_string(dungeon)
-    update_readme(map_str)
-    print("Daily map generated")
+    generator.save_to_json()
+    
+    ascii_map = generator.get_ascii_art()
+    update_readme(ascii_map, generator.seed)

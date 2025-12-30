@@ -2,14 +2,14 @@ name: Daily Map Generator
 
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  generate-map:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,21 +19,22 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.x'
 
-    - name: Generate Map
-      run: python generate_map.py
+    - name: Run Map Generator Script
+      run: python main.py
 
-    - name: Commit and Push
+    - name: Commit and Push changes
       run: |
+        # -------------------------------------------------------
+        # [IMPORTANT] Change these to your own info in your repo!
+        # -------------------------------------------------------
         git config --global user.name "Daily Map Generator"
         git config --global user.email "Example@github.com"
         
-        git add README.md
+        # Add both README and JSON file
+        git add README.md today_map.json
         
-        if [[ -n $(git status -s) ]]; then
-          git commit -m "Update Daily Map: $(date)"
-          git push
-        else
-          echo "No changes to commit"
-        fi
+        # Commit if there are changes
+        git commit -m "Daily Map Update: $(date +'%Y-%m-%d')" || exit 0
+        git push
