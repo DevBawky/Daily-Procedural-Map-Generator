@@ -1,5 +1,7 @@
 # Daily Procedural Map Generator
 
+[![Use this template](https://img.shields.io/badge/Use%20this%20template-238636?style=for-the-badge&logo=github)](https://github.com/new?template_name=Daily-Procedural-Map-Generator&template_owner=DevBawky)
+
 > __"A customized GitHub Action for Technical Design Portfolio"__
 
 This is a bot repository that automatically generates a procedural map every day.<br>
