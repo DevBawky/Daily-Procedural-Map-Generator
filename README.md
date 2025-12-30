@@ -18,8 +18,32 @@ It generates organic looking cave maps using the __Cellular Automata__ algorithm
 ## Getting Started
 
 You can run the script locally to generate a map or fork this repository to run the automation on your own profile.
+   
+### 1. Setup for Your Profile (Recommended)
+The easiest way to run this bot is to use this repository as a template.
 
-### 1. Run Locally
+#### Step 1: Create a Repository
+Click the __Use this template__ button at the top of this page to create a new repository.
+
+#### Step 2: Configure Permissions
+To allow the bot to update the README, you need to grant write permissions.
+1. Go to __Settings__ > __Actions__ > __General__.
+2. Scroll down to __Workflow permissions__.
+3. Select __Read and write permissions__.
+4. Click __Save__.
+
+#### Step 3: Update Git Configuration
+1. Open the `.github/workflows/main.yml` file in your new repository.
+2. Find the following lines:
+   ```yaml
+   git config --global user.name "Daily Map Generator"
+   git config --global user.email "Example@github.com"
+   ```
+3. Change "Daily Map Generator" and "Example@github.com" to your GitHub username and email.<br>(This ensures the daily commits are correctly attributed to you.)
+
+The Action is scheduled to run daily. You can also manually trigger it via the __Actions__ tab.
+
+### 2. Run Locally
 If you want to test the map generation algorithm on your local machine:
 
 1. __Clone the repository__
@@ -31,23 +55,6 @@ If you want to test the map generation algorithm on your local machine:
    ```bash
    python generate_map.py
    ```
-
-### 2. GitHub Actions Setup (For Forkers)
-If you fork this repository, you must configure permissions and update the user info to allow the bot to commit changes.
-
-#### Step 1: Configure Permissions
-1. Go to __Settings__ > __Actions__ > __General__.
-2. Scroll down to __Workflow permissions__.
-3. Select __Read and write permissions__.
-4. Click __Save__.
-
-#### Step 2: Update Git Configuration
-1. Open the `.github/workflows/main.yml` file.
-2. Locate the `git config` part.
-3. Replace the __user.email__ and __user.name__ with your own GitHub information.
-   *(This ensures the daily commits are attributed to you.)*
-
-The Action is scheduled to run daily. You can also manually trigger it via the __Actions__ tab.
 
 ## Tech Stack
 * Language : Python 3.x
