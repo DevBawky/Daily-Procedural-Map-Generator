@@ -2,7 +2,7 @@
 
 > __"A customized GitHub Action for Technical Design Portfolio"__
 
-매일 자동으로 절차적 지형(Procedural Map)을 생성하는 봇 레포지토리입니다.
+매일 자동으로 절차적 지형(Procedural Map)을 생성하는 봇 레포지토리입니다.<br>
  __자동화(Automation)__ 와 __절차적 콘텐츠 생성(PCG)__ 알고리즘을 학습하고 적용하기 위해 만들었습니다.
 
 ## How It Works
@@ -17,7 +17,7 @@ __Cellular Automata (셀룰러 오토마타)__ 알고리즘을 사용하여 유�
 
 ---
 
-## 💻 Tech Stack
+## Tech Stack
 - Language: Python 3.x
 - CI/CD: GitHub Actions
 - Algorithm: Cellular Automata for Cave Generation
