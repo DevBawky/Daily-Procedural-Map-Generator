@@ -24,7 +24,7 @@ If you want to test the map generation algorithm on your local machine:
 
 1. __Clone the repository__
    ```bash
-   git clone [https://github.com/DevBawky/Daily-Procedural-Map-Generator.git](https://github.com/DevBawky/Daily-Procedural-Map-Generator.git)
+   git clone https://github.com/DevBawky/Daily-Procedural-Map-Generator.git
    cd Daily-Procedural-Map-Generator
    ```
 2. __Run the script__
