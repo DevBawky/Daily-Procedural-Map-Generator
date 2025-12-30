@@ -32,7 +32,7 @@ jobs:
         git add README.md
         
         if [[ -n $(git status -s) ]]; then
-          git commit -m "🗺️ Update Daily Map: $(date)"
+          git commit -m "Update Daily Map: $(date)"
           git push
         else
           echo "No changes to commit"
