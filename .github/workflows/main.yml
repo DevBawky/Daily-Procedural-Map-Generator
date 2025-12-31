@@ -24,17 +24,18 @@ jobs:
     - name: Run Map Generator Script
       run: python generate_map.py
 
+    - name: Force README daily update
+      run: |
+        DATE=$(date +'%Y-%m-%d')
+        sed -i "/^Last Updated:/d" README.md
+        echo "Last Updated: ${DATE}" >> README.md
+
     - name: Commit and Push changes
       run: |
-        # -------------------------------------------------------
-        # [IMPORTANT] Change these to your own info in your repo!
-        # -------------------------------------------------------
         git config --global user.name "Daily Map Generator"
         git config --global user.email "Example@github.com"
-        
-        # Add both README and JSON file
+
         git add README.md today_map.json
-        
-        # Commit if there are changes
+
         git commit -m "Daily Map Update: $(date +'%Y-%m-%d')" || exit 0
         git push
